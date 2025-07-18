@@ -66,7 +66,7 @@ userSchema.methods.generateAccessToken = function(){
         {
             _id: this._id, // key
             email: this.email,
-            username: this.username, // payload
+            username: this.username, // payload     // We are storing in all this in our Access Token
             fullname: this.fullname
         },
         process.env.ACCESS_TOKEN_SECRET,
