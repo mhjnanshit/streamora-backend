@@ -51,7 +51,7 @@ const userSchema = new Schema({
 
 userSchema.pre("save", async function(next){
     if(!this.isModified("password")) return next() // tabhi chalao agar password change hua ho
-    this.password = bcrypt.hash(this.password, 10) // hash rounds
+    this.password = await bcrypt.hash(this.password, 10) // hash rounds
     next()
 })
 
