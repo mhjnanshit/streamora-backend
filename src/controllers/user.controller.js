@@ -14,7 +14,7 @@ const registerUser = asyncHandler( async (req,res) => {
     // remove password and refresh token field from response 
     // check for user creation response , return it
 
-    const {fullName, email, username, password} = req.body
+    const {fullname, email, username, password} = req.body
     //console.log("email: ", email)
 
     // if(fullName == ""){
@@ -29,7 +29,7 @@ const registerUser = asyncHandler( async (req,res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    const existeduser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{username},{email}]
     }) // Return if any given username OR email already exists in the db
 
@@ -38,11 +38,22 @@ const registerUser = asyncHandler( async (req,res) => {
     }
 
     const avatarLocalPath = req.files?.avatar[0]?.path      // We get the file path uploaded By Multer
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path (Would give error)
 
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar file is required")
     }
+    
+    // What if we dont send any coverImage to the db , as it is an optional field , To handle that
+
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
+
+    // This is due to basically JS issue , since the earlier method also correctly checks if coverImage is there or not but it returns undefined which is also treated as a value
+    // Here initially , the value is initially null and defined only when it passes all the checks!
+
 
     // Now , we can upload to the cloudinary
 
@@ -75,7 +86,7 @@ const registerUser = asyncHandler( async (req,res) => {
         throw new ApiError(500, "Error in Registering the user")
     }
 
-    // Now , user is creater and now send the response
+    // Now , user is created and now send the response
 
     return res.status(201).json(
         new ApiResponse(200, UserCreatedorNot, "User Registered Successfully!!!")
