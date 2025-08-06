@@ -94,5 +94,105 @@ const registerUser = asyncHandler( async (req,res) => {
 
 } )
 
+const loginUser = asyncHandler( async(req,res) => {
+    // fetch data from req body
+    // username or email
+    // find the user
+    // password check
+    // Generate access and refresh token
+    // send these tokens in cookie
 
-export {registerUser}
+    const {email, username, password} = req.body // Either credentials can be given
+
+    if(!username && !email){
+        throw new ApiError(400, "username or email is required")
+    }
+
+    const user = await User.findOne({
+      // Returns the first entry found in database
+      $or: [{username},{email}] // Either matching username or email is found in the database 
+    });  
+
+    if(!user){
+        throw new ApiError(404, "User not found!")
+    }
+
+    const isPasswordValid = await user.isPasswordCorrect(password) // To validate the password , the password stored in databse will be accessed by this.password (encrypted by bcrypt)
+
+    if (!isPasswordValid) {
+      throw new ApiError(401, "Password is Incorrect!");
+    }
+
+    // Now , we will generate tokens
+    // We are gonna do this frequently , better make it a method
+    const generateAccessAndRefreshTokens = async(user) => {
+        try{
+           const accessToken = user.generateAccessToken()
+           const refreshToken = user.generateRefreshToken()
+
+           user.refreshToken = refreshToken
+           await user.save({validateBeforeSave: false})
+
+            return {accessToken,refreshToken}
+
+        } catch(error){
+            throw new ApiError(500, "Something went wrong in generating access and refresh token") 
+        }
+    }
+
+   const {accessToken,refreshToken} = await generateAccessAndRefreshTokens(user)
+
+    //    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")  --> Less Efficient (DB Call)
+
+
+    const userToSend = user.toObject();
+    delete userToSend.password;             // Making it an object as user is already up to date here itself , no need for a db call
+    delete userToSend.refreshToken;
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                user: userToSend, accessToken, refreshToken
+            },
+            "User logged in Successfully"
+        )
+    )
+
+
+})
+
+const logoutUser = asyncHandler(async (req,res) => {
+    req.findbyIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    res.status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200,{},"User Logged Out!"))
+})
+// User loggedIn hai ya nhi iska use hume aur bhi jagah pdega that is why we made a middleware out of this. 
+
+export {registerUser,loginUser,logoutUser}
