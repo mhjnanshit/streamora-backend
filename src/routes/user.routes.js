@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { registerUser,loginUser,logoutUser, renewTokens } from "../controllers/user.controller.js";
+import { registerUser,loginUser,logoutUser, renewTokens, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateAvatar, updateCoverImage, getUserChannelProfile, getWatchHistory } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+
 
 const router = Router()
 
@@ -26,6 +27,15 @@ router.route("/login").post(loginUser);
 
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/renew-token").post(renewTokens);
+
+router.route("/change-password").post(verifyJWT,changeCurrentPassword)
+router.route("/curr-user").get(verifyJWT,getCurrentUser)
+router.route("/update-acc-details").patch(verifyJWT,updateAccountDetails)  // Updating detalis is a patch request
+router.route("/avatar-update").patch(verifyJWT,upload.single("avatar"),updateAvatar)
+router.route("/coverImage-update").patch(verifyJWT, upload.single("coverImage"),updateCoverImage);
+router.route("/c/:username").get(verifyJWT,getUserChannelProfile)
+router.route("/watchHistory").get(verifyJWT,getWatchHistory)
+
 
 
 export default router
