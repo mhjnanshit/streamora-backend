@@ -2,6 +2,7 @@ import { Router } from "express";
 import { registerUser,loginUser,logoutUser, renewTokens, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateAvatar, updateCoverImage, getUserChannelProfile, getWatchHistory } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import errorHandler from "../middlewares/error.middleware.js";
 
 
 const router = Router()
