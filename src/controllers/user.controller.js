@@ -6,6 +6,24 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose, { mongo } from "mongoose";
 
+const generateAccessAndRefreshTokens = async(userId) =>{
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
+
+        return {accessToken, refreshToken}
+
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating referesh and access token")
+    }
+
+  }
+
 const registerUser = asyncHandler(async (req, res) => {
   // get user details from frontend
   // validation - not empty
@@ -130,22 +148,22 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // Now , we will generate tokens
   // We are gonna do this frequently , better make it a method
-  const generateAccessAndRefreshTokens = async (user) => {
-    try {
-      const accessToken = user.generateAccessToken();
-      const refreshToken = user.generateRefreshToken();
+  // const generateAccessAndRefreshTokens = async (user) => {
+  //   try {
+  //     const accessToken = user.generateAccessToken();
+  //     const refreshToken = user.generateRefreshToken();
 
-      user.refreshToken = refreshToken;
-      await user.save({ validateBeforeSave: false });
+  //     user.refreshToken = refreshToken;
+  //     await user.save({ validateBeforeSave: false });
 
-      return { accessToken, refreshToken };
-    } catch (error) {
-      throw new ApiError(
-        500,
-        "Something went wrong in generating access and refresh token"
-      );
-    }
-  };
+  //     return { accessToken, refreshToken };
+  //   } catch (error) {
+  //     throw new ApiError(
+  //       500,
+  //       "Something went wrong in generating access and refresh token"
+  //     );
+  //   }
+  // };
 
   const { accessToken, refreshToken } =
     await generateAccessAndRefreshTokens(user);
@@ -205,7 +223,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 // User loggedIn hai ya nhi iska use hume aur bhi jagah pdega that is why we made a middleware out of this.
 
 const renewTokens = asyncHandler(async (req, res) => {
-  const incomingRefreshToken = req.cookie.refreshToken || req.body.refreshToken;
+  const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
   if (!incomingRefreshToken) {
     throw new ApiError(401, "Unauthorized request");
@@ -224,7 +242,7 @@ const renewTokens = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid refresh token");
   }
 
-  if (decodedToken !== user?.refreshToken) {
+  if (incomingRefreshToken !== user?.refreshToken) {
     throw new ApiError(401, "Refresh token is expired or used");
   }
 
@@ -271,7 +289,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(200, req.user, "Current User fetched Successfully");
+    .json(new ApiResponse(200, req.user, "Current User fetched Successfully"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {

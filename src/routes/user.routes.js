@@ -31,7 +31,7 @@ router.route("/renew-token").post(renewTokens);
 
 router.route("/change-password").post(verifyJWT,changeCurrentPassword)
 router.route("/curr-user").get(verifyJWT,getCurrentUser)
-router.route("/update-acc-details").patch(verifyJWT,updateAccountDetails)  // Updating detalis is a patch request
+router.route("/update-acc-details").patch(verifyJWT,updateAccountDetails)  // Updating details is a patch request
 router.route("/avatar-update").patch(verifyJWT,upload.single("avatar"),updateAvatar)
 router.route("/coverImage-update").patch(verifyJWT, upload.single("coverImage"),updateCoverImage);
 router.route("/c/:username").get(verifyJWT,getUserChannelProfile)
