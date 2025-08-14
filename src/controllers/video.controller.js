@@ -9,14 +9,22 @@ import mongoose from "mongoose";
 
 
 const publishAVideo = asyncHandler(async (req, res) => {
+
+  // Take the details of the video from the user - Title and description are mandatory
+  // Take video and thumbnail path via req.files.___.path
+  // Check if they are there. If yes , upload them on cloudinary and get the object
+  // Now , Video.create() 
+  // Check if video is created and return a response
+  // Also , the video and thumbnail would be on the server due to the multer middleware
+
   const { title, description } = req.body;
 
-  if ([title, description].some((field) => field?.trim() === "")) {
+  if (!title?.trim() || !description?.trim()) {
     throw new ApiError(400, "All fields are required");
   }
 
-  const videoFileLocalPath = req.files?.videoFile[0].path;
-  const thumbnailLocalPath = req.files?.thumbnail[0].path;
+  const videoFileLocalPath = req.files?.videoFile?.[0]?.path;
+  const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
 
   if (!videoFileLocalPath) {
     throw new ApiError(400, "videoFileLocalPath is required");
@@ -53,10 +61,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
     isPublished: false,
   });
 
-  const videoUploaded = await Video.findById(video._id);
-
-  if (!videoUploaded) {
-    throw new ApiError(500, "videoUpload failed please try again !!!");
+  if (!video) {
+    throw new ApiError(500, "Video Upload failed. Please try again!");
   }
 
   return res
