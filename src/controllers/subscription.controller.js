@@ -6,7 +6,7 @@ import { Subscription } from "../models/subscription.model.js";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
-  // TODO: toggle subscription
+  
 
   if (!isValidObjectId(channelId)) {
     throw new ApiError(400, "Invalid channelId");
