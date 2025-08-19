@@ -7,7 +7,7 @@ import errorHandler from "../middlewares/error.middleware.js";
 
 const router = Router()
 
-router.route("/register").post(
+router.route("/auth/register").post(
   // I will handle only POST requests with /register
   upload.fields([    // db mein upload hone se just pehle hum yeh middleware call krenge (jaate jaate humse milke jana logic) which will upload media to Multer
     {
@@ -22,20 +22,27 @@ router.route("/register").post(
   registerUser
 ); 
 
-router.route("/login").post(loginUser);
+router.route("/auth/login").post(loginUser);
 
 // Secure Routes
 
-router.route("/logout").post(verifyJWT, logoutUser);
-router.route("/renew-token").post(renewTokens);
+router.route("/auth/logout").post(verifyJWT, logoutUser);
 
-router.route("/change-password").post(verifyJWT,changeCurrentPassword)
-router.route("/curr-user").get(verifyJWT,getCurrentUser)
-router.route("/update-acc-details").patch(verifyJWT,updateAccountDetails)  // Updating details is a patch request
-router.route("/avatar-update").patch(verifyJWT,upload.single("avatar"),updateAvatar)
-router.route("/coverImage-update").patch(verifyJWT, upload.single("coverImage"),updateCoverImage);
-router.route("/c/:username").get(verifyJWT,getUserChannelProfile)
-router.route("/watchHistory").get(verifyJWT,getWatchHistory)
+router.route("/auth/renew-token").post(renewTokens);
+
+router.route("/users/me/password").post(verifyJWT, changeCurrentPassword);
+
+router.route("/users/me").get(verifyJWT, getCurrentUser);
+
+router.route("/users/me").patch(verifyJWT, updateAccountDetails);  // Updating details is a patch request
+
+router.route("/users/me/avatar").patch(verifyJWT, upload.single("avatar"), updateAvatar);
+
+router.route("/users/me/coverImage").patch(verifyJWT, upload.single("coverImage"), updateCoverImage);
+
+router.route("/users/:username").get(verifyJWT, getUserChannelProfile);
+
+router.route("/users/me/history").get(verifyJWT, getWatchHistory);
 
 
 
