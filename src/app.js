@@ -2,6 +2,9 @@ import cookieParser from "cookie-parser"
 import express from "express"
 import cors from "cors";
 import errorHandler from "./middlewares/error.middleware.js";
+import userRouter from './routes/user.routes.js'
+import videoRouter from './routes/video.routes.js'
+import subscriptionRouter from './routes/subscription.routes.js'
 
 const app = express()
 
@@ -18,11 +21,12 @@ app.use(cookieParser())
 
 // routes
 
-import userRouter from './routes/user.routes.js'
 
 // routes declaration
 
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/videos", videoRouter)
+app.use("/api/v1/subscriptions", subscriptionRouter)
 
 // http://localhost:8000/api/v1/users/register
 

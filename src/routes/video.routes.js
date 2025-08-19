@@ -12,7 +12,7 @@ import {
 
 const router = Router()
 
-router.route("/videos").post(
+router.route("/").post(
   verifyJWT,
   upload.fields([
     {
@@ -27,12 +27,12 @@ router.route("/videos").post(
   publishAVideo
 );
 
-router.route("/videos/:videoId").get(verifyJWT, getVideoById);
+router.route("/:videoId").get(verifyJWT, getVideoById);
 
-router.route("/videos/:videoId").delete(verifyJWT, deleteVideo);
+router.route("/:videoId").delete(verifyJWT, deleteVideo);
 
-router.route("/videos/:videoId").patch(verifyJWT, upload.single("thumbnail"), updateVideo);
+router.route("/:videoId").patch(verifyJWT, upload.single("thumbnail"), updateVideo);
 
-router.route("/videos/:videoId/togglePublish").patch(verifyJWT, togglePublishStatus);
+router.route("/:videoId/publish").patch(verifyJWT, togglePublishStatus);
 
 export default router;

@@ -30,19 +30,19 @@ router.route("/auth/logout").post(verifyJWT, logoutUser);
 
 router.route("/auth/renew-token").post(renewTokens);
 
-router.route("/users/me/password").post(verifyJWT, changeCurrentPassword);
+router.route("/me/password").post(verifyJWT, changeCurrentPassword);
 
-router.route("/users/me").get(verifyJWT, getCurrentUser);
+router.route("/me").get(verifyJWT, getCurrentUser);
 
-router.route("/users/me").patch(verifyJWT, updateAccountDetails);  // Updating details is a patch request
+router.route("/me").patch(verifyJWT, updateAccountDetails);  // Updating details is a patch request
 
-router.route("/users/me/avatar").patch(verifyJWT, upload.single("avatar"), updateAvatar);
+router.route("/me/avatar").patch(verifyJWT, upload.single("avatar"), updateAvatar);
 
-router.route("/users/me/coverImage").patch(verifyJWT, upload.single("coverImage"), updateCoverImage);
+router.route("/me/coverImage").patch(verifyJWT, upload.single("coverImage"), updateCoverImage);
 
-router.route("/users/:username").get(verifyJWT, getUserChannelProfile);
+router.route("/:username").get(verifyJWT, getUserChannelProfile);
 
-router.route("/users/me/history").get(verifyJWT, getWatchHistory);
+router.route("/me/history").get(verifyJWT, getWatchHistory);
 
 
 

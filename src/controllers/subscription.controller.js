@@ -5,37 +5,115 @@ import {ApiResponse} from "../utils/ApiResponse.js";
 import { Subscription } from "../models/subscription.model.js";
 
 
-const toggleSubscription = asyncHandler(async (req,res) => {
-    const {channelId} = req.params
-    // Check whether subscribed or not
+// const toggleSubscription = asyncHandler(async (req,res) => {
+//     const {channelId} = req.params
+//     // Check whether subscribed or not
+//     if(!isValidObjectId(channelId)){
+//       throw new ApiError(400, "The channel does not exist!")
+//     }
+
+//     const isSubscribed = await Subscription.findOne({
+//       subscriber: req.user?._id,
+//       channel: channelId,
+//     })
+
+//     if(isSubscribed){
+//       await Subscription.findByIdAndDelete(isSubscribed?._id)
+
+//       return res.status(200)
+//       .json(
+//         new ApiResponse(200, {subscribed: false}, "Unsubscribed Successfully!")
+//       )
+//     }
+
+//     await Subscription.create({
+//       subscriber: req.user?._id,
+//       channel: channelId,
+//     })
+
+//     return res.status(200)
+//     .json(
+//       new ApiResponse(200, {subscriber: true}, "Subscribed Successfully!")
+//     )
+// })
+// Instead of thius toggleSubscription method , IT IS NOT RESTful , I will opt for subscribe and unsubscribe method
+
+const subscribeChannel = asyncHandler(async (req,res) => {
+  const {channelId} = req.params;
+
     if(!isValidObjectId(channelId)){
-      throw new ApiError(400, "The channel does not exist!")
+      throw new ApiError(400 , "Channel not found") 
     }
 
     const isSubscribed = await Subscription.findOne({
       subscriber: req.user?._id,
-      channel: channelId,
+      channel: channelId
     })
 
     if(isSubscribed){
-      await Subscription.findByIdAndDelete(isSubscribed?._id)
-
       return res.status(200)
-      .json(
-        new ApiResponse(200, {subscribed: false}, "Unsubscribed Successfully!")
-      )
+            .json(
+              new ApiResponse(200, isSubscribed, "Already a subscriber!")
+            )
     }
 
-    await Subscription.create({
+    const addSubscriber = await Subscription.create({
       subscriber: req.user?._id,
       channel: channelId,
     })
 
-    return res.status(200)
-    .json(
-      new ApiResponse(200, {subscriber: true}, "Subscribed Successfully!")
-    )
+  
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { subscribed: true },
+          "Subscription Added Successfully!"
+        )
+      );
+
+    
 })
+
+
+
+const unsubscribeChannel = asyncHandler(async (req, res) => {
+  const { channelId } = req.params;
+
+  if (!isValidObjectId(channelId)) {
+    throw new ApiError(400, "Channel not found");
+  }
+
+  const isSubscribed = await Subscription.findOne({
+    subscriber: req.user?._id,
+    channel: channelId,
+  });
+
+  if (!isSubscribed) {
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(
+          404,
+          { subscribed: false },
+          "You are not subscribed to this channel"
+        )
+      );
+  }
+
+  await Subscription.findByIdAndDelete(isSubscribed._id);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { subscribed: false }, "Unsubscribed successfully")
+    );
+});
+
+
+
+
 
 // controller to return subscriber list of a channel
 // For each subscriber , include:
@@ -118,9 +196,14 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-  const { subscriberId } = req.params;
+  let { subscriberId } = req.params;
 
   subscriberId =  new mongoose.Types.ObjectId(subscriberId)
+
+  if (!isValidObjectId(subscriberId)) {
+    throw new ApiError(400, "Invalid subscriberId");
+  }
+
 
   const subscribedChannels = await Subscription.aggregate([
     {
@@ -169,4 +252,4 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
 });
 
 
-export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels };
+export { subscribeChannel, unsubscribeChannel, getUserChannelSubscribers, getSubscribedChannels };
