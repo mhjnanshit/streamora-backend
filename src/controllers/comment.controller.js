@@ -10,9 +10,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
   let { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
 
+  videoId = new mongoose.Types.ObjectId(videoId);
   const video = await Video.findById(videoId);
 
-  videoId = mongoose.Types.ObjectId(videoId);
 
   if (!video) {
     throw new ApiError(400, "Video does not exist!");

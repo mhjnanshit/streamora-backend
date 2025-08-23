@@ -6,7 +6,8 @@ import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/fileupload.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose, { isValidObjectId } from "mongoose";
-
+import {Like} from "../models/like.model.js"
+import {Comment} from "../models/comment.model.js"
 
 const publishAVideo = asyncHandler(async (req, res) => {
 
@@ -242,22 +243,18 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  // let userId = req.body;
 
-  // userId = new mongoose.Types.ObjectId(userId)
-  if (!isValidObjectId(videoId)) {
+  if (!mongoose.Types.ObjectId.isValid(videoId)) {
     throw new ApiError(400, "Invalid videoId");
   }
 
-  if (!isValidObjectId(req.user?._id)) {
+  if (!mongoose.Types.ObjectId.isValid(req.user?._id)) {
     throw new ApiError(400, "Invalid userId");
   }
 
   const video = await Video.aggregate([
     {
-      $match: {
-        _id: new mongoose.Types.ObjectId(videoId),
-      },
+      $match: { _id: new mongoose.Types.ObjectId(videoId) },
     },
     {
       $lookup: {
@@ -284,14 +281,12 @@ const getVideoById = asyncHandler(async (req, res) => {
           },
           {
             $addFields: {
-              subscribersCount: {
-                $size: "$subscribers",
-              },
+              subscribersCount: { $size: "$subscribers" },
               isSubscribed: {
                 $cond: {
                   if: {
                     $in: [
-                      mongoose.Types.ObjectId(req.user._id),
+                      { $literal: new mongoose.Types.ObjectId(req.user._id) },
                       "$subscribers.subscriber",
                     ],
                   },
@@ -314,15 +309,16 @@ const getVideoById = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        likesCount: {
-          $size: "$likes",
-        },
-        owner: {
-          $first: "$owner",
-        },
+        likesCount: { $size: "$likes" },
+        owner: { $first: "$owner" },
         isLiked: {
           $cond: {
-            if: { $in: [req.user?._id, "$likes.likedBy"] },
+            if: {
+              $in: [
+                { $literal: new mongoose.Types.ObjectId(req.user._id) },
+                "$likes.likedBy",
+              ],
+            },
             then: true,
             else: false,
           },
@@ -346,26 +342,22 @@ const getVideoById = asyncHandler(async (req, res) => {
   ]);
 
   if (!video || video.length === 0) {
-    throw new ApiError(500, "failed to fetch video");
+    throw new ApiError(404, "Video not found");
   }
 
-  // increment views if video fetched successfully
-  await Video.findByIdAndUpdate(videoId, {
-    $inc: {
-      views: 1,
-    },
-  });
+  const videoDoc = video[0];
 
-  // add this video to user watch history
-  await User.findByIdAndUpdate(req.user?._id, {
-    $addToSet: {
-      watchHistory: videoId,
-    },
+  // increment views
+  await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
+
+  // add to user watch history
+  await User.findByIdAndUpdate(req.user._id, {
+    $addToSet: { watchHistory: new mongoose.Types.ObjectId(videoId) },
   });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, video[0], "video details fetched successfully"));
+    .json(new ApiResponse(200, videoDoc, "Video details fetched successfully"));
 });
 
 export {

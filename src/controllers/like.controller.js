@@ -71,7 +71,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
   const likedVideos = await Like.aggregate([
     {
       $match: {
-        likedBy: new mongoose.Types.ObjectId(req.user?._id),
+        likedBy: new mongoose.Types.ObjectId(req.user._id),
       },
     },
     {
@@ -79,8 +79,9 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         from: "videos",
         localField: "video",
         foreignField: "_id",
-        as: "likedvideos",
+        as: "likedVideos",
         pipeline: [
+          { $match: { isPublished: true } }, // only published videos
           {
             $lookup: {
               from: "users",
@@ -89,9 +90,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
               as: "ownerDetails",
             },
           },
-          {
-            $unwind: "$ownerDetails",
-          },
+          { $unwind: "$ownerDetails" },
           {
             $project: {
               _id: 1,
@@ -110,28 +109,23 @@ const getLikedVideos = asyncHandler(async (req, res) => {
               },
             },
           },
+          { $sort: { createdAt: -1 } }, // sort inside pipeline
         ],
       },
     },
     {
-      $unwind: "$likedvideos",
+      $unwind: "$likedVideos", // one document per liked video
     },
     {
-      $sort: {
-        createdAt: -1,
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        likedVideo: 1,
-      },
+      $replaceRoot: { newRoot: "$likedVideos" }, // make the video the top-level object
     },
   ]);
 
-  return res.status(200)
-  .json(new ApiResponse(200, likedVideos, "Liked Videos fetched successfully!"))
-
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, likedVideos, "Liked Videos fetched successfully!")
+    );
 });
 
 export { toggleCommentLike, toggleVideoLike, getLikedVideos };
