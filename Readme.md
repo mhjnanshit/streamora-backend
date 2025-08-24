@@ -1,6 +1,6 @@
 # 🎬 Streamora - Video Platform Backend
 
-**Streamora** is a scalable, full-featured backend for a YouTube-like video content platform. It supports user authentication, video uploads, playlist management, likes, comments, subscriptions, and watch history tracking, built using modern backend technologies and best practices.
+**Streamora** is a scalable, full-featured backend service for a modern video content platform. It provides secure user authentication, video management, playlist organization, interactive features (likes, comments, subscriptions), and watch history tracking. Designed with production-grade practices, Streamora ensures clean API design, reliable data modeling, and cloud-based media handling for seamless integration into any video-centric application.
 
 ---
 
