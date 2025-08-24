@@ -78,7 +78,7 @@ Server runs at http://localhost:8000
 ## 📫 API Testing
 
 **Test all endpoints using Postman:**
-**[Postman Collection Link]**(https://www.postman.com/your-collection-link)
+**[Postman Collection Link](https://www.postman.com/your-collection-link)**
 
 **Endpoints included:**
 User registration and login
