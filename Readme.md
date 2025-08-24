@@ -110,7 +110,7 @@ src/
 
 ## 👨‍💻 Author
 
-**Anshit Mahajan***
+**Anshit Mahajan**
 - ***GitHub: https://github.com/mhjnanshit***
 - ***Email: mahajananshit0@gmail.com***
 
