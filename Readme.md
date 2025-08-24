@@ -53,7 +53,7 @@
 1. **Clone the repository**
 
 ```bash
-git clone [<repo-link>](https://github.com/mhjnanshit/streamora-backend)
+git clone [https://github.com/mhjnanshit/streamora-backend](https://github.com/mhjnanshit/streamora-backend.git)
 cd streamora
 npm install
 ```
