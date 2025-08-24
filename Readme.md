@@ -53,14 +53,14 @@
 1. **Clone the repository**
 
 ```bash
-git clone <repo-link>
+git clone [<repo-link>](https://github.com/mhjnanshit/streamora-backend)
 cd streamora
 npm install
 ```
 2. **Create a .env file at the root with the following variables:**
 
 ```bash
-PORT=5000
+PORT=8000
 MONGO_URI=<your-mongodb-uri>
 JWT_SECRET=<your-jwt-secret>
 CLOUDINARY_CLOUD_NAME=<your-cloud-name>
