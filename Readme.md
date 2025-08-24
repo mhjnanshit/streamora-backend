@@ -56,6 +56,37 @@
 git clone <repo-link>
 cd streamora
 npm install
+```
+2. **Create a .env file at the root with the following variables:**
+
+```bash
+PORT=5000
+MONGO_URI=<your-mongodb-uri>
+JWT_SECRET=<your-jwt-secret>
+CLOUDINARY_CLOUD_NAME=<your-cloud-name>
+CLOUDINARY_API_KEY=<your-api-key>
+CLOUDINARY_API_SECRET=<your-api-secret>
+```
+3. **Run the development server**
+
+```bash
+npm run dev
+```
+
+Server runs at http://localhost:8000
+
+## 📫 API Testing
+
+**Test all endpoints using Postman:**
+**[Postman Collection Link]**(https://www.postman.com/your-collection-link)
+
+**Endpoints included:**
+User registration and login
+Video uploads, publishing, fetching, and deleting
+Playlist management
+Likes, comments, and subscriptions
+Watch history
+   
 
 
 
