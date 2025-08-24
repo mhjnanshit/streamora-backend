@@ -81,11 +81,39 @@ Server runs at http://localhost:8000
 **[Postman Collection Link](https://www.postman.com/your-collection-link)**
 
 **Endpoints included:**
-User registration and login
-Video uploads, publishing, fetching, and deleting
-Playlist management
-Likes, comments, and subscriptions
-Watch history
+- User registration and login
+- Video uploads, publishing, fetching, and deleting
+- Playlist management
+- Likes, comments, and subscriptions
+- Watch history
+
+
+## 📂 Folder Structure
+
+```bash
+src/
+├─ controllers/   # Route handlers
+├─ models/        # MongoDB schemas
+├─ routes/        # API routes
+├─ middleware/    # Authentication & error handling
+├─ utils/         # Helpers, Cloudinary integration, API responses
+└─ index.js       # Server entry point
+```
+
+## ✅ Notes & Best Practices
+
+- Use JSON body for endpoints that accept textual data.
+- Use multipart/form-data for file uploads (videos & thumbnails).
+- All ObjectIds are validated before processing to avoid errors.
+- Proper error handling is implemented with consistent API response format.
+- Aggregated endpoints provide additional info like owner details, likes, and subscription status.
+
+## 👨‍💻 Author
+
+***Anshit Mahajan***
+- **GitHub: https://github.com/mhjnanshit**
+- **Email: mahajananshit0@gmail.com**
+
    
 
 
